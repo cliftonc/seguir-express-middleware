@@ -1,0 +1,37 @@
+{
+  "name": "seguir-express-middleware",
+  "version": "0.1.0",
+  "description": "Experss middleware for seguir self-hosted social network backend and API",
+  "main": "index.js",
+  "scripts": {
+    "test": "istanbul cover _mocha -- -R spec tests/unit/*",
+    "docs": "apidoc -i . -e node_modules -o doc"
+  },
+  "keywords": [
+    "social",
+    "api",
+    "express",
+    "follow",
+    "friend",
+    "like",
+    "post",
+    "cassandra"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cliftonc/seguir-express-middleware.git"
+  },
+  "author": "clifton.cunningham@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^0.9.0",
+    "express": "^4.11.0",
+    "lodash": "^2.4.1"
+  },
+  "devDependencies": {
+    "apidoc": "^0.12.1",
+    "expect.js": "^0.3.1",
+    "istanbul": "^0.3.5",
+    "mocha": "^2.1.0"
+  }
+}

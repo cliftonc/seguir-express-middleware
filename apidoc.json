@@ -1,0 +1,4 @@
+{
+  "name": "Seguir Express Middleware",
+  "description": "Express middleware that simplifies adding a first party set of routes for the Seguir social network backend."
+}
