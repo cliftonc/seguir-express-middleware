@@ -16,16 +16,29 @@
  *  app.use('/social', seguirMiddleware(seguir, authApi, authForm));
  *
  *  authApi is middleware that checks that the user is authorised to use the API, it returns a JSON response with a 403.
- *  authForm is middleware that checks the user is authorised to post data via a form, and so redirects to a login page.
  *
- *  The app is passed in to avoid this project having a dependency on Express.
+ *  Express and Seguir are passed in to avoid the express and seguir dependency outside of testing.
  *
  */
-var express = require('express');
+var _ = require('lodash');
 
-module.exports = function(seguir, authApi, authForm) {
+module.exports = function(options, express, seguir, authApi) {
 
-    var router = express.Router();
+  var router = express.Router();
+
+  var defaults = {
+    post: true,
+    friend: true,
+    follow: true,
+    like: true
+  }
+
+  options = _.defaults(options, defaults);
+
+  var respondWithError = function(err, res) {
+    res.status(err.statusCode || 500);
+    res.send(err);
+  }
 
   /**
    * @apiDefine ApiPosts Posts
@@ -33,7 +46,7 @@ module.exports = function(seguir, authApi, authForm) {
 
   /**
    * @api {post} /post Add a post
-   * @apiName Posts
+   * @apiName AddPost
    * @apiGroup ApiPosts
    * @apiVersion 1.0.0
    *
@@ -43,10 +56,32 @@ module.exports = function(seguir, authApi, authForm) {
    * @apiParam {Boolean} isprivate is the post private
    *
    */
-  router.post('/post', authForm, function(req, res) {
-      seguir.addPost(req.user.seguirId, req.body.content, Date.now(), req.body.isprivate, function(err, post) {
-        res.redirect(req.body.returnUrl);
-      })
+  router.post('/post', authApi, function(req, res) {
+    var isprivate = req.body.isprivate === 'true';
+    var ispersonal = req.body.ispersonal === 'true';
+    seguir.addPost(req.user.seguirId, req.body.content, Date.now(), isprivate, ispersonal, function(err, post) {
+      console.dir(err);
+      if(err) { return respondWithError(err, res); }
+      res.send(post);
+    });
+  });
+
+  /**
+   * @api {del} /post/:post Remove a post
+   * @apiName DeletePost
+   * @apiGroup ApiPosts
+   * @apiVersion 1.0.0
+   *
+   * @apiDescription Deletes a post
+   * @apiParam {Object} user expects req.user to be present, with req.user.seguirId
+   * @apiParam {String} post the guid of the post
+   *
+   */
+  router.delete('/post/:post', authApi, function(req, res) {
+      seguir.removePost(req.user.seguirId, req.params.post, function(err, result) {
+        if(err) { return respondWithError(err, res); }
+        res.send(result);
+      });
   });
 
   /**
@@ -67,6 +102,7 @@ module.exports = function(seguir, authApi, authForm) {
    */
     router.post('/friend', authApi, function(req, res) {
       seguir.addFriendRequest(req.user.seguirId, req.body.user, req.body.message, Date.now(), function(err, friend) {
+        if(err) { return respondWithError(err, res); }
         res.send(friend);
       });
     });
@@ -84,6 +120,7 @@ module.exports = function(seguir, authApi, authForm) {
      */
     router.delete('/friend/:user', authApi, function(req, res) {
       seguir.removeFriend(req.user.seguirId, req.params.user, function(err, result) {
+        if(err) { return respondWithError(err, res); }
         res.send(result);
       });
     });
@@ -101,6 +138,7 @@ module.exports = function(seguir, authApi, authForm) {
      */
     router.post('/friend/accept', authApi, function(req, res) {
       seguir.acceptFriendRequest(req.user.seguirId, req.body.friend_request, function(err, friend_request) {
+        if(err) { return respondWithError(err, res); }
         res.send(friend_request);
       });
     });
@@ -122,8 +160,9 @@ module.exports = function(seguir, authApi, authForm) {
      */
     router.post('/follow', authApi, function(req, res) {
       seguir.followUser(req.user.seguirId, req.body.user, Date.now(), function(err, follow) {
+        if(err) { return respondWithError(err, res); }
         res.send(follow);
-      })
+      });
     });
 
     /**
@@ -139,6 +178,7 @@ module.exports = function(seguir, authApi, authForm) {
      */
     router.delete('/follow/:user', authApi, function(req, res) {
       seguir.unFollowUser(req.user.seguirId, req.params.user, function(err, result) {
+        if(err) { return respondWithError(err, res); }
         res.send(result);
       });
     });
