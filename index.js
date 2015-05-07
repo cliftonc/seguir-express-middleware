@@ -15,7 +15,9 @@
  *  var seguirMiddleware = require('seguir-express-middleware');
  *  app.use('/social', seguirMiddleware(seguir, authApi, authForm));
  *
- *  authApi is middleware that checks that the user is authorised to use the API, it returns a JSON response with a 403.
+ *  authApi is middleware that checks that the user is authorised to use the API.
+ *
+ *  This middleware assumes that the user exists on 'req.user', with property 'seguirId' (TODO: can be over-ridden with options.seguirIdProperty);
  *
  *  Express and Seguir are passed in to avoid the express and seguir dependency outside of testing.
  *
@@ -27,6 +29,8 @@ module.exports = function(options, express, seguir, authApi) {
   var router = express.Router();
 
   var defaults = {
+    userProperty: 'user',
+    seguirIdProperty: 'seguirId',
     post: true,
     friend: true,
     follow: true,
@@ -38,6 +42,19 @@ module.exports = function(options, express, seguir, authApi) {
   var respondWithError = function(err, res) {
     res.status(err.statusCode || 500);
     res.send(err);
+  }
+
+  function getSeguirId(req) {
+
+    if(options.userProperty && options.seguirIdProperty && req[options.userProperty] && req[options.userProperty][options.seguirIdProperty]) {
+      return req[options.userProperty][options.seguirIdProperty];
+    }
+
+    if(options.seguirIdProperty && req[options.seguirIdProperty]) {
+      return req[options.seguirIdProperty];
+    }
+
+    return null;
   }
 
   /**
@@ -59,8 +76,10 @@ module.exports = function(options, express, seguir, authApi) {
   router.post('/post', authApi, function(req, res) {
     var isprivate = req.body.isprivate === 'true';
     var ispersonal = req.body.ispersonal === 'true';
-    seguir.addPost(req.user.seguirId, req.body.content, Date.now(), isprivate, ispersonal, function(err, post) {
-      console.dir(err);
+    var seguirId = getSeguirId(req);
+    console.dir(req.user);
+    console.dir(seguirId);
+    seguir.addPost(seguirId, req.body.content, Date.now(), isprivate, ispersonal, function(err, post) {
       if(err) { return respondWithError(err, res); }
       res.send(post);
     });
@@ -78,7 +97,8 @@ module.exports = function(options, express, seguir, authApi) {
    *
    */
   router.delete('/post/:post', authApi, function(req, res) {
-      seguir.removePost(req.user.seguirId, req.params.post, function(err, result) {
+      var seguirId = getSeguirId(req);
+      seguir.removePost(seguirId, req.params.post, function(err, result) {
         if(err) { return respondWithError(err, res); }
         res.send(result);
       });
@@ -101,7 +121,8 @@ module.exports = function(options, express, seguir, authApi) {
    *
    */
     router.post('/friend', authApi, function(req, res) {
-      seguir.addFriendRequest(req.user.seguirId, req.body.user, req.body.message, Date.now(), function(err, friend) {
+      var seguirId = getSeguirId(req);
+      seguir.addFriendRequest(seguirId, req.body.user, req.body.message, Date.now(), function(err, friend) {
         if(err) { return respondWithError(err, res); }
         res.send(friend);
       });
@@ -119,7 +140,8 @@ module.exports = function(options, express, seguir, authApi) {
      *
      */
     router.delete('/friend/:user', authApi, function(req, res) {
-      seguir.removeFriend(req.user.seguirId, req.params.user, function(err, result) {
+      var seguirId = getSeguirId(req);
+      seguir.removeFriend(seguirId, req.params.user, function(err, result) {
         if(err) { return respondWithError(err, res); }
         res.send(result);
       });
@@ -159,7 +181,8 @@ module.exports = function(options, express, seguir, authApi) {
      *
      */
     router.post('/follow', authApi, function(req, res) {
-      seguir.followUser(req.user.seguirId, req.body.user, Date.now(), function(err, follow) {
+      var seguirId = getSeguirId(req);
+      seguir.followUser(seguirId, req.body.user, Date.now(), function(err, follow) {
         if(err) { return respondWithError(err, res); }
         res.send(follow);
       });
@@ -177,9 +200,71 @@ module.exports = function(options, express, seguir, authApi) {
      *
      */
     router.delete('/follow/:user', authApi, function(req, res) {
-      seguir.unFollowUser(req.user.seguirId, req.params.user, function(err, result) {
+      var seguirId = getSeguirId(req);
+      seguir.unFollowUser(seguirId, req.params.user, function(err, result) {
         if(err) { return respondWithError(err, res); }
         res.send(result);
+      });
+    });
+
+    /**
+     * @apiDefine ApiLikes Likes
+     */
+
+    /**
+     * @api {post} /like Add a like
+     * @apiName AddLike
+     * @apiGroup ApiLikes
+     * @apiVersion 1.0.0
+     *
+     * @apiDescription Creates a like
+     * @apiParam {Object} user expects req.user to be present, with req.user.seguirId
+     * @apiParam {String} item the url of the item they like
+     *
+     */
+    router.post('/like', authApi, function(req, res) {
+      var seguirId = getSeguirId(req);
+      seguir.addLike(seguirId, req.body.item, function(err, like) {
+        if(err) { return respondWithError(err, res); }
+        res.send(like);
+      });
+    });
+
+    /**
+     * @api {get} /like/item Check if a user likes an item
+     * @apiName GetLike
+     * @apiGroup ApiLikes
+     * @apiVersion 1.0.0
+     *
+     * @apiDescription Checks a like
+     * @apiParam {Object} user expects req.user to be present, with req.user.seguirId
+     * @apiParam {String} item the url of the item they like
+     *
+     */
+    router.get('/like/:item', authApi, function(req, res) {
+      var seguirId = getSeguirId(req);
+      seguir.checkLike(seguirId, req.params.item, function(err, like) {
+        if(err) { return respondWithError(err, res); }
+        res.send(like);
+      });
+    });
+
+    /**
+     * @api {del} /like/:item Add a like
+     * @apiName AddLike
+     * @apiGroup ApiLikes
+     * @apiVersion 1.0.0
+     *
+     * @apiDescription Creates a like
+     * @apiParam {Object} user expects req.user to be present, with req.user.seguirId
+     * @apiParam {String} item the url of the item they like
+     *
+     */
+    router.delete('/like/:item', authApi, function(req, res) {
+      var seguirId = getSeguirId(req);
+      seguir.removeLike(seguirId, req.params.item, function(err, like) {
+        if(err) { return respondWithError(err, res); }
+        res.send(like);
       });
     });
 
