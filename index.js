@@ -77,8 +77,6 @@ module.exports = function(options, express, seguir, authApi) {
     var isprivate = req.body.isprivate === 'true';
     var ispersonal = req.body.ispersonal === 'true';
     var seguirId = getSeguirId(req);
-    console.dir(req.user);
-    console.dir(seguirId);
     seguir.addPost(seguirId, req.body.content, Date.now(), isprivate, ispersonal, function(err, post) {
       if(err) { return respondWithError(err, res); }
       res.send(post);
@@ -265,6 +263,24 @@ module.exports = function(options, express, seguir, authApi) {
       seguir.removeLike(seguirId, req.params.item, function(err, like) {
         if(err) { return respondWithError(err, res); }
         res.send(like);
+      });
+    });
+
+    /**
+     * @api {del} /feed Get feed for logged in user
+     * @apiName GetFeed
+     * @apiGroup ApiFeeds
+     * @apiVersion 1.0.0
+     *
+     * @apiDescription Gets a user feed
+     * @apiParam {Object} user expects req.user to be present, with req.user.seguirId
+     *
+     */
+    router.get('/feed', authApi, function(req, res) {
+      var seguirId = getSeguirId(req);
+      seguir.getUserFeed(seguirId, seguirId, 50, function(err, feed) {
+        if(err) { return respondWithError(err, res); }
+        res.send(feed);
       });
     });
 
