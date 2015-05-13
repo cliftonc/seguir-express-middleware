@@ -105,8 +105,9 @@ module.exports = function(options, express, seguir, authMiddleware) {
    *
    */
   router.post(u('addPost'), authMiddleware, function(req, res) {
-    var isprivate = req.body.isprivate === 'true';
-    var ispersonal = req.body.ispersonal === 'true';
+    var isprivate = req.body.isprivate === 'true' || req.body.isprivate === true;
+    var ispersonal = req.body.ispersonal === 'true' || req.body.ispersonal === true;
+    console.dir(req.body);
     var seguirId = getSeguirId(req);
     seguir.addPost(seguirId, req.body.content, Date.now(), isprivate, ispersonal, function(err, post) {
       if(err) { return respondWithError(err, res); }
