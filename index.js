@@ -107,7 +107,6 @@ module.exports = function(options, express, seguir, authMiddleware) {
   router.post(u('addPost'), authMiddleware, function(req, res) {
     var isprivate = req.body.isprivate === 'true' || req.body.isprivate === true;
     var ispersonal = req.body.ispersonal === 'true' || req.body.ispersonal === true;
-    console.dir(req.body);
     var seguirId = getSeguirId(req);
     seguir.addPost(seguirId, req.body.content, Date.now(), isprivate, ispersonal, function(err, post) {
       if(err) { return respondWithError(err, res); }
@@ -349,12 +348,12 @@ module.exports = function(options, express, seguir, authMiddleware) {
      * @apiVersion 1.0.0
      *
      * @apiDescription Gets a user feed
-     * @apiParam {Object} user expects req.user to be present, with req.user.seguirId
+     * @apiParam {Object} user users req.user.seguirId as the user id
      *
      */
     router.get(u('getFeed'), authMiddleware, function(req, res) {
       var seguirId = getSeguirId(req);
-      seguir.getFeedForUser(seguirId, seguirId, 0, 50, function(err, feed) {
+      seguir.getFeedForUser(seguirId, req.params.user, 0, 50, function(err, feed) {
         if(err) { return respondWithError(err, res); }
         res.send(feed);
       });
