@@ -1,6 +1,6 @@
 {
   "name": "seguir-express-middleware",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Experss middleware for seguir self-hosted social network backend and API",
   "main": "index.js",
   "scripts": {
