@@ -353,7 +353,7 @@ module.exports = function(options, express, seguir, authMiddleware) {
      */
     router.get(u('getFeed'), authMiddleware, function(req, res) {
       var seguirId = getSeguirId(req);
-      seguir.getFeedForUser(seguirId, req.params.user, 0, 50, function(err, feed) {
+      seguir.getFeed(seguirId, req.params.user, 0, 50, function(err, feed) {
         if(err) { return respondWithError(err, res); }
         res.send(feed);
       });
@@ -372,7 +372,7 @@ module.exports = function(options, express, seguir, authMiddleware) {
      */
     router.get(u('getUserFeed'), authMiddleware, function(req, res) {
       var seguirId = getSeguirId(req);
-      seguir.getUserFeedForUser(seguirId, req.params.user, 0, 50, function(err, feed) {
+      seguir.getUserFeed(seguirId, req.params.user, 0, 50, function(err, feed) {
         if(err) { return respondWithError(err, res); }
         res.send(feed);
       });
