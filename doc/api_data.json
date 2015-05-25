@@ -142,7 +142,7 @@
   },
   {
     "type": "post",
-    "url": "/friend/accept",
+    "url": "/friend-request/accept",
     "title": "Accept a friend request",
     "name": "AcceptFriendRequest",
     "group": "ApiFriends",
@@ -173,7 +173,7 @@
   },
   {
     "type": "post",
-    "url": "/friend",
+    "url": "/friend-request",
     "title": "Add a friend request",
     "name": "AddFriendRequest",
     "group": "ApiFriends",
@@ -211,12 +211,12 @@
   },
   {
     "type": "get",
-    "url": "/friend",
+    "url": "/friend-request/active",
     "title": "Get list of friend requests",
     "name": "GetFriendRequests",
     "group": "ApiFriends",
     "version": "1.0.0",
-    "description": "<p>Creates a friend request</p> ",
+    "description": "<p>Gets a list of users friend requests</p> ",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -226,20 +226,6 @@
             "optional": false,
             "field": "req.user",
             "description": "<p>expects req.user to be present, with req.user.seguirId</p> "
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "user",
-            "description": "<p>the user to send a friend request to</p> "
-          },
-          {
-            "group": "Parameter",
-            "type": "Boolean",
-            "optional": false,
-            "field": "message",
-            "description": "<p>the message to send with the request</p> "
           }
         ]
       }
