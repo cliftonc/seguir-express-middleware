@@ -1,5 +1,53 @@
 define({ "api": [
   {
+    "type": "del",
+    "url": "/feed",
+    "title": "Get feed for logged in user",
+    "name": "GetFeed",
+    "group": "ApiFeeds",
+    "version": "1.0.0",
+    "description": "<p>Gets a user feed</p> ",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": "<p>users req.user.seguirId as the user id</p> "
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "ApiFeeds"
+  },
+  {
+    "type": "del",
+    "url": "/feed",
+    "title": "Get user feed for user",
+    "name": "GetFeed",
+    "group": "ApiFeeds",
+    "version": "1.0.0",
+    "description": "<p>Gets a user feed</p> ",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "user",
+            "description": "<p>user of feed to view</p> "
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "ApiFeeds"
+  },
+  {
     "type": "post",
     "url": "/follow",
     "title": "Follow another user",
@@ -23,6 +71,37 @@ define({ "api": [
             "optional": false,
             "field": "user",
             "description": "<p>the guid of the user to follow</p> "
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Following"
+  },
+  {
+    "type": "get",
+    "url": "/user/:user/followers",
+    "title": "Get followers",
+    "name": "Follow",
+    "group": "ApiFollow",
+    "version": "1.0.0",
+    "description": "<p>Stops following another user</p> ",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "req.user",
+            "description": "<p>expects req.user to be present, with req.user.seguirId</p> "
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "user",
+            "description": "<p>the guid of the user to get followers for</p> "
           }
         ]
       }
@@ -60,6 +139,75 @@ define({ "api": [
     },
     "filename": "./index.js",
     "groupTitle": "Following"
+  },
+  {
+    "type": "post",
+    "url": "/friend/accept",
+    "title": "Accept a friend request",
+    "name": "Friends",
+    "group": "ApiFriends",
+    "version": "1.0.0",
+    "description": "<p>Accepts a friend request sent by another user.</p> ",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "req.user",
+            "description": "<p>expects req.user to be present, with req.user.seguirId</p> "
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "friend_request",
+            "description": "<p>the request guid to accept</p> "
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Friends"
+  },
+  {
+    "type": "get",
+    "url": "/friend",
+    "title": "Get list of friend requests",
+    "name": "Friends",
+    "group": "ApiFriends",
+    "version": "1.0.0",
+    "description": "<p>Creates a friend request</p> ",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "req.user",
+            "description": "<p>expects req.user to be present, with req.user.seguirId</p> "
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "user",
+            "description": "<p>the user to send a friend request to</p> "
+          },
+          {
+            "group": "Parameter",
+            "type": "Boolean",
+            "optional": false,
+            "field": "message",
+            "description": "<p>the message to send with the request</p> "
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Friends"
   },
   {
     "type": "post",
@@ -101,7 +249,7 @@ define({ "api": [
   },
   {
     "type": "delete",
-    "url": "/friend/:user",
+    "url": "/user/:user/friend/:user_friend",
     "title": "Remove a friendship",
     "name": "Friends",
     "group": "ApiFriends",
@@ -131,13 +279,13 @@ define({ "api": [
     "groupTitle": "Friends"
   },
   {
-    "type": "post",
-    "url": "/friend/accept",
-    "title": "Accept a friend request",
-    "name": "Friends",
-    "group": "ApiFriends",
+    "type": "del",
+    "url": "/like/:item",
+    "title": "Add a like",
+    "name": "AddLike",
+    "group": "ApiLikes",
     "version": "1.0.0",
-    "description": "<p>Accepts a friend request sent by another user.</p> ",
+    "description": "<p>Creates a like</p> ",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -145,27 +293,89 @@ define({ "api": [
             "group": "Parameter",
             "type": "Object",
             "optional": false,
-            "field": "req.user",
+            "field": "user",
             "description": "<p>expects req.user to be present, with req.user.seguirId</p> "
           },
           {
             "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "friend_request",
-            "description": "<p>the request guid to accept</p> "
+            "field": "item",
+            "description": "<p>the url of the item they like</p> "
           }
         ]
       }
     },
     "filename": "./index.js",
-    "groupTitle": "Friends"
+    "groupTitle": "Likes"
+  },
+  {
+    "type": "post",
+    "url": "/like",
+    "title": "Add a like",
+    "name": "AddLike",
+    "group": "ApiLikes",
+    "version": "1.0.0",
+    "description": "<p>Creates a like</p> ",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": "<p>expects req.user to be present, with req.user.seguirId</p> "
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "item",
+            "description": "<p>the url of the item they like</p> "
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Likes"
+  },
+  {
+    "type": "get",
+    "url": "/like/item",
+    "title": "Check if a user likes an item",
+    "name": "GetLike",
+    "group": "ApiLikes",
+    "version": "1.0.0",
+    "description": "<p>Checks a like</p> ",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": "<p>expects req.user to be present, with req.user.seguirId</p> "
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "item",
+            "description": "<p>the url of the item they like</p> "
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Likes"
   },
   {
     "type": "post",
     "url": "/post",
     "title": "Add a post",
-    "name": "Posts",
+    "name": "AddPost",
     "group": "ApiPosts",
     "version": "1.0.0",
     "description": "<p>Creates a post</p> ",
@@ -198,6 +408,178 @@ define({ "api": [
     },
     "filename": "./index.js",
     "groupTitle": "Posts"
+  },
+  {
+    "type": "del",
+    "url": "/post/:post",
+    "title": "Remove a post",
+    "name": "DeletePost",
+    "group": "ApiPosts",
+    "version": "1.0.0",
+    "description": "<p>Deletes a post</p> ",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": "<p>expects req.user to be present, with req.user.seguirId</p> "
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "post",
+            "description": "<p>the guid of the post</p> "
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Posts"
+  },
+  {
+    "type": "post",
+    "url": "/post/:post",
+    "title": "get a post",
+    "name": "GetPost",
+    "group": "ApiPosts",
+    "version": "1.0.0",
+    "description": "<p>Gets a post</p> ",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": "<p>expects req.user to be present, with req.user.seguirId</p> "
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "post",
+            "description": "<p>the guid of the post</p> "
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Posts"
+  },
+  {
+    "type": "get",
+    "url": "/user/:user",
+    "title": "get a user details",
+    "name": "GetUser",
+    "group": "ApiUsers",
+    "version": "1.0.0",
+    "description": "<p>Gets details of a user by guid</p> ",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": "<p>expects req.user to be present, with req.user.seguirId</p> "
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Users"
+  },
+  {
+    "type": "get",
+    "url": "/useraltid/:altid",
+    "title": "get a user details by altid",
+    "name": "GetUserByAltid",
+    "group": "ApiUsers",
+    "version": "1.0.0",
+    "description": "<p>Gets details of a user by username</p> ",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": "<p>expects req.user to be present, with req.user.seguirId</p> "
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "altid",
+            "description": "<p>the altid of the user to get details for</p> "
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Users"
+  },
+  {
+    "type": "get",
+    "url": "/username/:username",
+    "title": "get a user details by username",
+    "name": "GetUserByName",
+    "group": "ApiUsers",
+    "version": "1.0.0",
+    "description": "<p>Gets details of a user by username</p> ",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": "<p>expects req.user to be present, with req.user.seguirId</p> "
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>the name of the user to get details for</p> "
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Users"
+  },
+  {
+    "type": "get",
+    "url": "/user/:user/relationship",
+    "title": "get a relationship details",
+    "name": "GetUserRelationship",
+    "group": "ApiUsers",
+    "version": "1.0.0",
+    "description": "<p>Gets details of a relationship between the logged in user and someone else</p> ",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": "<p>expects req.user to be present, with req.user.seguirId</p> "
+          }
+        ]
+      }
+    },
+    "filename": "./index.js",
+    "groupTitle": "Users"
   },
   {
     "success": {

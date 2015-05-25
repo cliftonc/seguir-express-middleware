@@ -24,7 +24,7 @@
  */
 var _ = require('lodash');
 
-module.exports = function(options, express, seguir, authMiddleware) {
+module.exports = function (options, express, seguir, authMiddleware) {
 
   var router = express.Router();
   var u = seguir.urls; // Url helper
@@ -36,28 +36,27 @@ module.exports = function(options, express, seguir, authMiddleware) {
     friend: true,
     follow: true,
     like: true
-  }
+  };
 
   options = _.defaults(options, defaults);
 
-  var respondWithError = function(err, res) {
+  var respondWithError = function (err, res) {
     res.status(err.statusCode || 500);
     res.send(err);
-  }
+  };
 
-  function getSeguirId(req) {
+  function getSeguirId (req) {
 
-    if(options.userProperty && options.seguirIdProperty && req[options.userProperty] && req[options.userProperty][options.seguirIdProperty]) {
+    if (options.userProperty && options.seguirIdProperty && req[options.userProperty] && req[options.userProperty][options.seguirIdProperty]) {
       return req[options.userProperty][options.seguirIdProperty];
     }
 
-    if(options.seguirIdProperty && req[options.seguirIdProperty]) {
+    if (options.seguirIdProperty && req[options.seguirIdProperty]) {
       return req[options.seguirIdProperty];
     }
 
     return null;
   }
-
 
   // addUser:                    '/user',
   // getUser:                    '/user/:user',
@@ -66,12 +65,88 @@ module.exports = function(options, express, seguir, authMiddleware) {
   // getUserRelationship:        '/user/:user/relationship',
 
   /**
-   * @apiDefine ApiPosts Posts
+   * @apiDefine ApiUsers Users
    */
 
-  // addPost:                    '/post',
-  // getPost:                    '/post/:post',
-  // removePost:                 '/post/:post',
+  /**
+   * @api {get} /user/:user get a user details
+   * @apiName GetUser
+   * @apiGroup ApiUsers
+   * @apiVersion 1.0.0
+   *
+   * @apiDescription Gets details of a user by guid
+   * @apiParam {Object} user expects req.user to be present, with req.user.seguirId
+   * @apiParam {String} user the guid of the user to get details for
+   *
+   */
+  router.get(u('getUser'), authMiddleware, function (req, res) {
+    var seguirId = getSeguirId(req);
+    seguir.getUser(seguirId, req.params.user, function (err, user) {
+      if (err) { return respondWithError(err, res); }
+      res.send(user);
+    });
+  });
+
+  /**
+   * @api {get} /username/:username get a user details by username
+   * @apiName GetUserByName
+   * @apiGroup ApiUsers
+   * @apiVersion 1.0.0
+   *
+   * @apiDescription Gets details of a user by username
+   * @apiParam {Object} user expects req.user to be present, with req.user.seguirId
+   * @apiParam {String} username the name of the user to get details for
+   *
+   */
+  router.get(u('getUserByName'), authMiddleware, function (req, res) {
+    var seguirId = getSeguirId(req);
+    seguir.getUserByName(seguirId, req.params.username, function (err, user) {
+      if (err) { return respondWithError(err, res); }
+      res.send(user);
+    });
+  });
+
+  /**
+   * @api {get} /useraltid/:altid get a user details by altid
+   * @apiName GetUserByAltid
+   * @apiGroup ApiUsers
+   * @apiVersion 1.0.0
+   *
+   * @apiDescription Gets details of a user by username
+   * @apiParam {Object} user expects req.user to be present, with req.user.seguirId
+   * @apiParam {String} altid the altid of the user to get details for
+   *
+   */
+  router.get(u('getUserByAltId'), authMiddleware, function (req, res) {
+    var seguirId = getSeguirId(req);
+    seguir.getUserByAltId(seguirId, req.params.altid, function (err, user) {
+      if (err) { return respondWithError(err, res); }
+      res.send(user);
+    });
+  });
+
+  /**
+   * @api {get} /user/:user/relationship get a relationship details
+   * @apiName GetUserRelationship
+   * @apiGroup ApiUsers
+   * @apiVersion 1.0.0
+   *
+   * @apiDescription Gets details of a relationship between the logged in user and someone else
+   * @apiParam {Object} user expects req.user to be present, with req.user.seguirId
+   * @apiParam {String} user the guid of the user to compare to the logged in user
+   *
+   */
+  router.get(u('getUserRelationship'), authMiddleware, function (req, res) {
+    var seguirId = getSeguirId(req);
+    seguir.getUserRelationship(seguirId, req.params.user, function (err, relationship) {
+      if (err) { return respondWithError(err, res); }
+      res.send(relationship);
+    });
+  });
+
+  /**
+   * @apiDefine ApiPosts Posts
+   */
 
   /**
    * @api {post} /post/:post get a post
@@ -84,10 +159,10 @@ module.exports = function(options, express, seguir, authMiddleware) {
    * @apiParam {String} post the guid of the post
    *
    */
-  router.get(u('getPost'), authMiddleware, function(req, res) {
+  router.get(u('getPost'), authMiddleware, function (req, res) {
     var seguirId = getSeguirId(req);
-    seguir.getPost(seguirId, req.params.post, function(err, post) {
-      if(err) { return respondWithError(err, res); }
+    seguir.getPost(seguirId, req.params.post, function (err, post) {
+      if (err) { return respondWithError(err, res); }
       res.send(post);
     });
   });
@@ -104,12 +179,12 @@ module.exports = function(options, express, seguir, authMiddleware) {
    * @apiParam {Boolean} isprivate is the post private
    *
    */
-  router.post(u('addPost'), authMiddleware, function(req, res) {
+  router.post(u('addPost'), authMiddleware, function (req, res) {
     var isprivate = req.body.isprivate === 'true' || req.body.isprivate === true;
     var ispersonal = req.body.ispersonal === 'true' || req.body.ispersonal === true;
     var seguirId = getSeguirId(req);
-    seguir.addPost(seguirId, req.body.content, Date.now(), isprivate, ispersonal, function(err, post) {
-      if(err) { return respondWithError(err, res); }
+    seguir.addPost(seguirId, req.body.content, Date.now(), isprivate, ispersonal, function (err, post) {
+      if (err) { return respondWithError(err, res); }
       res.send(post);
     });
   });
@@ -125,25 +200,17 @@ module.exports = function(options, express, seguir, authMiddleware) {
    * @apiParam {String} post the guid of the post
    *
    */
-  router.delete(u('removePost'), authMiddleware, function(req, res) {
-      var seguirId = getSeguirId(req);
-      seguir.removePost(seguirId, req.params.post, function(err, result) {
-        if(err) { return respondWithError(err, res); }
-        res.send(result);
-      });
+  router.delete(u('removePost'), authMiddleware, function (req, res) {
+    var seguirId = getSeguirId(req);
+    seguir.removePost(seguirId, req.params.post, function (err, result) {
+      if (err) { return respondWithError(err, res); }
+      res.send(result);
+    });
   });
 
   /**
    * @apiDefine ApiFriends Friends
    */
-
-  // addFriend:                  '/friend',
-  // getFriend:                  '/friend/:friend',
-  // removeFriend:               '/user/:user/friend/:user_friend',
-  // getFriends:                 '/user/:user/friends',
-  // addFriendRequest:           '/friend-request',
-  // getFriendRequests:          '/friend-request/active',
-  // acceptFriendRequest:        '/friend-request/accept',
 
   /**
    * @api {get} /friend Get list of friend requests
@@ -157,13 +224,13 @@ module.exports = function(options, express, seguir, authMiddleware) {
    * @apiParam {Boolean} message the message to send with the request
    *
    */
-    router.get(u('getFriendRequests'), authMiddleware, function(req, res) {
-      var seguirId = getSeguirId(req);
-      seguir.getFriendRequests(seguirId, function(err, friend_requests) {
-        if(err) { return respondWithError(err, res); }
-        res.send(friend_requests);
-      });
+  router.get(u('getFriendRequests'), authMiddleware, function (req, res) {
+    var seguirId = getSeguirId(req);
+    seguir.getFriendRequests(seguirId, function (err, friend_requests) {
+      if (err) { return respondWithError(err, res); }
+      res.send(friend_requests);
     });
+  });
 
   /**
    * @api {post} /friend Add a friend request
@@ -177,207 +244,210 @@ module.exports = function(options, express, seguir, authMiddleware) {
    * @apiParam {Boolean} message the message to send with the request
    *
    */
-    router.post(u('addFriendRequest'), authMiddleware, function(req, res) {
-      var seguirId = getSeguirId(req);
-      seguir.addFriendRequest(seguirId, req.body.user, req.body.message, Date.now(), function(err, friend) {
-        if(err) { return respondWithError(err, res); }
-        res.send(friend);
-      });
+  router.post(u('addFriendRequest'), authMiddleware, function (req, res) {
+    var seguirId = getSeguirId(req);
+    seguir.addFriendRequest(seguirId, req.body.user, req.body.message, Date.now(), function (err, friend) {
+      if (err) { return respondWithError(err, res); }
+      res.send(friend);
     });
+  });
 
-    /**
-     * @api {delete} /user/:user/friend/:user_friend Remove a friendship
-     * @apiName Friends
-     * @apiGroup ApiFriends
-     * @apiVersion 1.0.0
-     *
-     * @apiDescription Removes a friend relationship
-     * @apiParam {Object} req.user expects req.user to be present, with req.user.seguirId
-     * @apiParam {String} user the user to stop being friends with
-     *
-     */
-    router.delete(u('removeFriend'), authMiddleware, function(req, res) {
-      var seguirId = getSeguirId(req);
-      seguir.removeFriend(seguirId, req.params.user, function(err, result) {
-        if(err) { return respondWithError(err, res); }
-        res.send(result);
-      });
+  /**
+   * @api {delete} /user/:user/friend/:user_friend Remove a friendship
+   * @apiName Friends
+   * @apiGroup ApiFriends
+   * @apiVersion 1.0.0
+   *
+   * @apiDescription Removes a friend relationship
+   * @apiParam {Object} req.user expects req.user to be present, with req.user.seguirId
+   * @apiParam {String} user the user to stop being friends with
+   *
+   */
+  router.delete(u('removeFriend'), authMiddleware, function (req, res) {
+    var seguirId = getSeguirId(req);
+    seguir.removeFriend(seguirId, req.params.user, function (err, result) {
+      if (err) { return respondWithError(err, res); }
+      res.send(result);
     });
+  });
 
-    /**
-     * @api {post} /friend/accept Accept a friend request
-     * @apiName Friends
-     * @apiGroup ApiFriends
-     * @apiVersion 1.0.0
-     *
-     * @apiDescription Accepts a friend request sent by another user.
-     * @apiParam {Object} req.user expects req.user to be present, with req.user.seguirId
-     * @apiParam {String} friend_request the request guid to accept
-     *
-     */
-    router.post(u('acceptFriendRequest'), authMiddleware, function(req, res) {
-      seguir.acceptFriendRequest(req.user.seguirId, req.body.friend_request, function(err, friend_request) {
-        if(err) { return respondWithError(err, res); }
-        res.send(friend_request);
-      });
+  /**
+   * @api {post} /friend/accept Accept a friend request
+   * @apiName Friends
+   * @apiGroup ApiFriends
+   * @apiVersion 1.0.0
+   *
+   * @apiDescription Accepts a friend request sent by another user.
+   * @apiParam {Object} req.user expects req.user to be present, with req.user.seguirId
+   * @apiParam {String} friend_request the request guid to accept
+   *
+   */
+  router.post(u('acceptFriendRequest'), authMiddleware, function (req, res) {
+    seguir.acceptFriendRequest(req.user.seguirId, req.body.friend_request, function (err, friend_request) {
+      if (err) { return respondWithError(err, res); }
+      res.send(friend_request);
     });
+  });
 
+  /**
+   * @apiDefine ApiFollow Following
+   */
 
-    /**
-     * @apiDefine ApiFollow Following
-     */
-
-    // addFollower:                '/follower',
-    // getFollow:                  '/follower/:follow',
-    // removeFollower:             '/user/:user/follower/:user_follower',
-    // getFollowers:               '/user/:user/followers',
-
-    /**
-     * @api {post} /follow Follow another user
-     * @apiName Follow
-     * @apiGroup ApiFollow
-     * @apiVersion 1.0.0
-     *
-     * @apiDescription Follows another user
-     * @apiParam {Object} req.user expects req.user to be present, with req.user.seguirId
-     * @apiParam {String} user the guid of the user to follow
-     *
-     */
-    router.post(u('addFollower'), authMiddleware, function(req, res) {
-      var seguirId = getSeguirId(req);
-      seguir.followUser(seguirId, req.body.user, Date.now(), function(err, follow) {
-        if(err) { return respondWithError(err, res); }
-        res.send(follow);
-      });
+  /**
+   * @api {post} /follow Follow another user
+   * @apiName Follow
+   * @apiGroup ApiFollow
+   * @apiVersion 1.0.0
+   *
+   * @apiDescription Follows another user
+   * @apiParam {Object} req.user expects req.user to be present, with req.user.seguirId
+   * @apiParam {String} user the guid of the user to follow
+   *
+   */
+  router.post(u('addFollower'), authMiddleware, function (req, res) {
+    var seguirId = getSeguirId(req);
+    seguir.followUser(seguirId, req.body.user, Date.now(), function (err, follow) {
+      if (err) { return respondWithError(err, res); }
+      res.send(follow);
     });
+  });
 
-    /**
-     * @api {delete} /follow/:user Un-follow another user
-     * @apiName Follow
-     * @apiGroup ApiFollow
-     * @apiVersion 1.0.0
-     *
-     * @apiDescription Stops following another user
-     * @apiParam {Object} req.user expects req.user to be present, with req.user.seguirId
-     * @apiParam {String} user the guid of the user to stop following
-     *
-     */
-    router.delete(u('removeFollower'), authMiddleware, function(req, res) {
-      var seguirId = getSeguirId(req);
-      seguir.unFollowUser(seguirId, req.params.user, function(err, result) {
-        if(err) { return respondWithError(err, res); }
-        res.send(result);
-      });
+  /**
+   * @api {delete} /follow/:user Un-follow another user
+   * @apiName Follow
+   * @apiGroup ApiFollow
+   * @apiVersion 1.0.0
+   *
+   * @apiDescription Stops following another user
+   * @apiParam {Object} req.user expects req.user to be present, with req.user.seguirId
+   * @apiParam {String} user the guid of the user to stop following
+   *
+   */
+  router.delete(u('removeFollower'), authMiddleware, function (req, res) {
+    var seguirId = getSeguirId(req);
+    seguir.unFollowUser(seguirId, req.params.user, function (err, result) {
+      if (err) { return respondWithError(err, res); }
+      res.send(result);
     });
+  });
 
-    /**
-     * @apiDefine ApiLikes Likes
-     */
-
-    // addLike:                    '/like',
-  // getLike:                    '/like/:like',
-  // checkLike:                  '/user/:user/like/:item',
-  // removeLike:                 '/user/:user/like/:item',
-
-
-    /**
-     * @api {post} /like Add a like
-     * @apiName AddLike
-     * @apiGroup ApiLikes
-     * @apiVersion 1.0.0
-     *
-     * @apiDescription Creates a like
-     * @apiParam {Object} user expects req.user to be present, with req.user.seguirId
-     * @apiParam {String} item the url of the item they like
-     *
-     */
-    router.post(u('addLike'), authMiddleware, function(req, res) {
-      var seguirId = getSeguirId(req);
-      seguir.addLike(seguirId, req.body.item, function(err, like) {
-        if(err) { return respondWithError(err, res); }
-        res.send(like);
-      });
+  /**
+   * @api {get} /user/:user/followers Get followers
+   * @apiName Follow
+   * @apiGroup ApiFollow
+   * @apiVersion 1.0.0
+   *
+   * @apiDescription Stops following another user
+   * @apiParam {Object} req.user expects req.user to be present, with req.user.seguirId
+   * @apiParam {String} user the guid of the user to get followers for
+   *
+   */
+  router.get(u('getFollowers'), authMiddleware, function (req, res) {
+    var seguirId = getSeguirId(req);
+    seguir.getFollowers(seguirId, req.params.user, function (err, result) {
+      if (err) { return respondWithError(err, res); }
+      res.send(result);
     });
+  });
 
-    /**
-     * @api {get} /like/item Check if a user likes an item
-     * @apiName GetLike
-     * @apiGroup ApiLikes
-     * @apiVersion 1.0.0
-     *
-     * @apiDescription Checks a like
-     * @apiParam {Object} user expects req.user to be present, with req.user.seguirId
-     * @apiParam {String} item the url of the item they like
-     *
-     */
-    router.get(u('checkLike'), authMiddleware, function(req, res) {
-      var seguirId = getSeguirId(req);
-      seguir.checkLike(seguirId, req.params.item, function(err, like) {
-        if(err) { return respondWithError(err, res); }
-        res.send(like);
-      });
+  /**
+   * @apiDefine ApiLikes Likes
+   */
+
+  /**
+   * @api {post} /like Add a like
+   * @apiName AddLike
+   * @apiGroup ApiLikes
+   * @apiVersion 1.0.0
+   *
+   * @apiDescription Creates a like
+   * @apiParam {Object} user expects req.user to be present, with req.user.seguirId
+   * @apiParam {String} item the url of the item they like
+   *
+   */
+  router.post(u('addLike'), authMiddleware, function (req, res) {
+    var seguirId = getSeguirId(req);
+    seguir.addLike(seguirId, req.body.item, function (err, like) {
+      if (err) { return respondWithError(err, res); }
+      res.send(like);
     });
+  });
 
-    /**
-     * @api {del} /like/:item Add a like
-     * @apiName AddLike
-     * @apiGroup ApiLikes
-     * @apiVersion 1.0.0
-     *
-     * @apiDescription Creates a like
-     * @apiParam {Object} user expects req.user to be present, with req.user.seguirId
-     * @apiParam {String} item the url of the item they like
-     *
-     */
-    router.delete(u('removeLike'), authMiddleware, function(req, res) {
-      var seguirId = getSeguirId(req);
-      seguir.removeLike(seguirId, req.params.item, function(err, like) {
-        if(err) { return respondWithError(err, res); }
-        res.send(like);
-      });
+  /**
+   * @api {get} /like/item Check if a user likes an item
+   * @apiName GetLike
+   * @apiGroup ApiLikes
+   * @apiVersion 1.0.0
+   *
+   * @apiDescription Checks a like
+   * @apiParam {Object} user expects req.user to be present, with req.user.seguirId
+   * @apiParam {String} item the url of the item they like
+   *
+   */
+  router.get(u('checkLike'), authMiddleware, function (req, res) {
+    var seguirId = getSeguirId(req);
+    seguir.checkLike(seguirId, req.params.item, function (err, like) {
+      if (err) { return respondWithError(err, res); }
+      res.send(like);
     });
+  });
 
-
-    // getFeed:                    '/feed/:user',
-    // getUserFeed:                '/feed/:user/direct'
-
-    /**
-     * @api {del} /feed Get feed for logged in user
-     * @apiName GetFeed
-     * @apiGroup ApiFeeds
-     * @apiVersion 1.0.0
-     *
-     * @apiDescription Gets a user feed
-     * @apiParam {Object} user users req.user.seguirId as the user id
-     *
-     */
-    router.get(u('getFeed'), authMiddleware, function(req, res) {
-      var seguirId = getSeguirId(req);
-      seguir.getFeed(seguirId, req.params.user, 0, 50, function(err, feed) {
-        if(err) { return respondWithError(err, res); }
-        res.send(feed);
-      });
+  /**
+   * @api {del} /like/:item Add a like
+   * @apiName AddLike
+   * @apiGroup ApiLikes
+   * @apiVersion 1.0.0
+   *
+   * @apiDescription Creates a like
+   * @apiParam {Object} user expects req.user to be present, with req.user.seguirId
+   * @apiParam {String} item the url of the item they like
+   *
+   */
+  router.delete(u('removeLike'), authMiddleware, function (req, res) {
+    var seguirId = getSeguirId(req);
+    seguir.removeLike(seguirId, req.params.item, function (err, like) {
+      if (err) { return respondWithError(err, res); }
+      res.send(like);
     });
+  });
 
-    /**
-     * @api {del} /feed Get user feed for user
-     * @apiName GetFeed
-     * @apiGroup ApiFeeds
-     * @apiVersion 1.0.0
-     *
-     * @apiDescription Gets a user feed
-     * @apiParam {String} user user of feed to view
-     * @apiParam {Object} user expects req.user to be present, with req.user.seguirId
-     *
-     */
-    router.get(u('getUserFeed'), authMiddleware, function(req, res) {
-      var seguirId = getSeguirId(req);
-      seguir.getUserFeed(seguirId, req.params.user, 0, 50, function(err, feed) {
-        if(err) { return respondWithError(err, res); }
-        res.send(feed);
-      });
+  /**
+   * @api {del} /feed Get feed for logged in user
+   * @apiName GetFeed
+   * @apiGroup ApiFeeds
+   * @apiVersion 1.0.0
+   *
+   * @apiDescription Gets a user feed
+   * @apiParam {Object} user users req.user.seguirId as the user id
+   *
+   */
+  router.get(u('getFeed'), authMiddleware, function (req, res) {
+    var seguirId = getSeguirId(req);
+    seguir.getFeed(seguirId, req.params.user, 0, 50, function (err, feed) {
+      if (err) { return respondWithError(err, res); }
+      res.send(feed);
     });
+  });
 
-    return router;
+  /**
+   * @api {del} /feed Get user feed for user
+   * @apiName GetFeed
+   * @apiGroup ApiFeeds
+   * @apiVersion 1.0.0
+   *
+   * @apiDescription Gets a user feed
+   * @apiParam {String} user user of feed to view
+   * @apiParam {Object} user expects req.user to be present, with req.user.seguirId
+   *
+   */
+  router.get(u('getUserFeed'), authMiddleware, function (req, res) {
+    var seguirId = getSeguirId(req);
+    seguir.getUserFeed(seguirId, req.params.user, 0, 50, function (err, feed) {
+      if (err) { return respondWithError(err, res); }
+      res.send(feed);
+    });
+  });
 
-}
+  return router;
+
+};
