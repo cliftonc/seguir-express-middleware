@@ -217,15 +217,13 @@ module.exports = function (options, express, seguir, authMiddleware) {
      */
 
     /**
-     * @api {get} /friend Get list of friend requests
+     * @api {get} /friend-request/active Get list of friend requests
      * @apiName GetFriendRequests
      * @apiGroup ApiFriends
      * @apiVersion 1.0.0
      *
-     * @apiDescription Creates a friend request
+     * @apiDescription Gets a list of users friend requests
      * @apiParam {Object} req.user expects req.user to be present, with req.user.seguirId
-     * @apiParam {String} user the user to send a friend request to
-     * @apiParam {Boolean} message the message to send with the request
      *
      */
     router.get(u('getFriendRequests'), authMiddleware, function (req, res) {
@@ -237,7 +235,7 @@ module.exports = function (options, express, seguir, authMiddleware) {
     });
 
     /**
-     * @api {post} /friend Add a friend request
+     * @api {post} /friend-request Add a friend request
      * @apiName AddFriendRequest
      * @apiGroup ApiFriends
      * @apiVersion 1.0.0
@@ -276,7 +274,7 @@ module.exports = function (options, express, seguir, authMiddleware) {
     });
 
     /**
-     * @api {post} /friend/accept Accept a friend request
+     * @api {post} /friend-request/accept Accept a friend request
      * @apiName AcceptFriendRequest
      * @apiGroup ApiFriends
      * @apiVersion 1.0.0
