@@ -43,14 +43,14 @@ Additionally, you can switch off the elements of the api that you do not want to
 
 ```json
 {
-  'userProperty': 'user',
-  'seguirIdProperty': 'seguirId',
-  'user': true,
-  'post': true,
-  'friend': true,
-  'follow': true,
-  'like': true,
-  'feed': true
+  "userProperty": "user",
+  "seguirIdProperty": "seguirId",
+  "user": true,
+  "post": true,
+  "friend": true,
+  "follow": true,
+  "like": true,
+  "feed": true
 }
 ```
 
