@@ -53,3 +53,18 @@ Additionally, you can switch off the elements of the api that you do not want to
   feed: true
 }
 ```
+
+### Docs
+
+```shell
+npm run docs
+```
+
+This will create API documents in /docs.
+
+```shell
+git subtree push --prefix doc origin gh-pages
+```
+
+This will push any documentation changes to gh-pages.
+
