@@ -218,7 +218,7 @@ module.exports = function (options, express, seguir, authMiddleware) {
 
     /**
      * @api {get} /friend Get list of friend requests
-     * @apiName Friends
+     * @apiName GetFriendRequests
      * @apiGroup ApiFriends
      * @apiVersion 1.0.0
      *
@@ -238,7 +238,7 @@ module.exports = function (options, express, seguir, authMiddleware) {
 
     /**
      * @api {post} /friend Add a friend request
-     * @apiName Friends
+     * @apiName AddFriendRequest
      * @apiGroup ApiFriends
      * @apiVersion 1.0.0
      *
@@ -258,7 +258,7 @@ module.exports = function (options, express, seguir, authMiddleware) {
 
     /**
      * @api {delete} /user/:user/friend/:user_friend Remove a friendship
-     * @apiName Friends
+     * @apiName RemoveFriend
      * @apiGroup ApiFriends
      * @apiVersion 1.0.0
      *
@@ -277,7 +277,7 @@ module.exports = function (options, express, seguir, authMiddleware) {
 
     /**
      * @api {post} /friend/accept Accept a friend request
-     * @apiName Friends
+     * @apiName AcceptFriendRequest
      * @apiGroup ApiFriends
      * @apiVersion 1.0.0
      *
@@ -303,7 +303,7 @@ module.exports = function (options, express, seguir, authMiddleware) {
 
     /**
      * @api {post} /follow Follow another user
-     * @apiName Follow
+     * @apiName AddFollower
      * @apiGroup ApiFollow
      * @apiVersion 1.0.0
      *
@@ -322,7 +322,7 @@ module.exports = function (options, express, seguir, authMiddleware) {
 
     /**
      * @api {delete} /follow/:user Un-follow another user
-     * @apiName Follow
+     * @apiName RemoveFollower
      * @apiGroup ApiFollow
      * @apiVersion 1.0.0
      *
@@ -341,7 +341,7 @@ module.exports = function (options, express, seguir, authMiddleware) {
 
     /**
      * @api {get} /user/:user/followers Get followers
-     * @apiName Follow
+     * @apiName GetFollowers
      * @apiGroup ApiFollow
      * @apiVersion 1.0.0
      *
@@ -386,7 +386,7 @@ module.exports = function (options, express, seguir, authMiddleware) {
 
     /**
      * @api {get} /like/item Check if a user likes an item
-     * @apiName GetLike
+     * @apiName CheckLike
      * @apiGroup ApiLikes
      * @apiVersion 1.0.0
      *
@@ -446,7 +446,7 @@ module.exports = function (options, express, seguir, authMiddleware) {
 
     /**
      * @api {del} /feed Get user feed for user
-     * @apiName GetFeed
+     * @apiName GetUserFeed
      * @apiGroup ApiFeeds
      * @apiVersion 1.0.0
      *
